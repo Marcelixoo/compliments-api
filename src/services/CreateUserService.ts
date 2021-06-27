@@ -1,11 +1,13 @@
 import { getCustomRepository } from "typeorm";
 import { BusinessRuleViolation } from "../errors/BusinessRuleViolation";
 import { ValidationError } from "../errors/ValidationError";
-import { UsersRepository } from "../repositories/UsersRepository"
+import { UsersRepository } from "../repositories/UsersRepository";
+import { hash } from "bcryptjs";
 
 interface ICreateUserRequest {
     name: string;
     email: string;
+    password: string;
     admin?: boolean;
 }
 
@@ -17,10 +19,12 @@ class CreateUserService {
         this.usersRepository = getCustomRepository(UsersRepository);
     }
 
-    async execute({ name, email, admin }: ICreateUserRequest) {
+    async execute({ name, email, admin, password }: ICreateUserRequest) {
         await this.assertEmailIsNotYetTaken(email);
 
-        const user = this.usersRepository.create({ name, email, admin });
+        const hashedPassword = await hash(String(password), 8);
+
+        const user = this.usersRepository.create({ name, email, admin, password: hashedPassword });
 
         await this.usersRepository.save(user);
 
