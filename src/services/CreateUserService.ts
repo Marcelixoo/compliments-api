@@ -1,4 +1,6 @@
 import { getCustomRepository } from "typeorm";
+import { BusinessRuleViolation } from "../errors/BusinessRuleViolation";
+import { ValidationError } from "../errors/ValidationError";
 import { UsersRepository } from "../repositories/UsersRepository"
 
 interface ICreateUserRequest {
@@ -26,15 +28,27 @@ class CreateUserService {
     }
 
     async assertEmailIsNotYetTaken(email: string) {
-        if (!email) {
-            throw new Error("The e-mail address must be provided.");
-        }
+        this.assertEmailIsNotEmpty(email);
 
         const emailIsAlreadyTaken = await this.usersRepository.findOne({ email })
 
         if (emailIsAlreadyTaken) {
-            throw new Error(`The email ${email} is already taken.`);
+            throw new EmailHasAlreadyBeenTaken(email);
         }
+    }
+
+    assertEmailIsNotEmpty(email: string) {
+        if (!email) {
+            throw new ValidationError("Field is required.", "email");
+        }
+    }
+}
+
+class EmailHasAlreadyBeenTaken extends BusinessRuleViolation {
+    fieldName: string;
+
+    constructor(email: string) {
+        super(`The e-mail ${email} has already been taken.`);
     }
 }
 
