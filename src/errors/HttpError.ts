@@ -1,4 +1,5 @@
 import { BusinessRuleViolation } from "./BusinessRuleViolation";
+import { AuthenticationError } from "./AuthenticationError";
 import { ValidationError } from "./ValidationError";
 
 class HttpError extends Error {
@@ -33,11 +34,21 @@ class HttpError extends Error {
             });
         }
 
+        if (error instanceof AuthenticationError) {
+            return new HttpError(error.message, 401, {
+                error: {
+                    title: "Unauthorized",
+                    status: 401,
+                    detail: error.message
+                }
+            });
+        }
+
         return new HttpError(error.message, 500, {
             errors: {
                 title: "Internal Server Error",
                 status: 500,
-                detail: "Internal server error."
+                detail: error.message
             }
         });
     }

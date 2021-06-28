@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import { AuthenticationError } from "../errors/AuthenticationError";
 
 export function ensureAdmin(request: Request, response: Response, next: NextFunction) {
     const isAdmin = true;
@@ -7,7 +8,11 @@ export function ensureAdmin(request: Request, response: Response, next: NextFunc
         return next();
     }
 
-    return response.status(401).json({
-        error: "Unauthorized"
-    });
+    throw new AdministrationRightsViolation();
+}
+
+class AdministrationRightsViolation extends AuthenticationError {
+    constructor() {
+        super("This operation requires admin rights.");
+    }
 }
