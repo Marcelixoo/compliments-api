@@ -13,8 +13,10 @@ class Tag {
 
     @Expose({ name: "label" })
     label(): string {
-        return `#${this.name}`;
+        const concatenatedAndCapitalized = new ConcatenatedAndCapitalized(this.name);
+        return `#${concatenatedAndCapitalized.asString()}`;
     }
+
 
     @CreateDateColumn()
     created_at: Date;
@@ -26,6 +28,29 @@ class Tag {
         if (!this.id) {
             this.id = uuid();
         }
+    }
+}
+
+class ConcatenatedAndCapitalized {
+    value: string;
+
+    constructor(word) {
+        this.value = this.concatenate(this.capitalize(word));
+    }
+
+    capitalize(word) {
+        return word.split(" ").map((fragment) => {
+            const [firstLetter, ...rest] = fragment;
+            return firstLetter.toUpperCase() + rest.join("");
+        })
+    }
+
+    concatenate(words) {
+        return words.join("");
+    }
+
+    asString() {
+        return this.value;
     }
 }
 
