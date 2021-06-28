@@ -1,3 +1,4 @@
+import { Expose } from "class-transformer";
 import { Entity, Column, PrimaryColumn, CreateDateColumn, UpdateDateColumn } from "typeorm";
 import { v4 as uuid } from "uuid";
 
@@ -9,6 +10,11 @@ class Tag {
 
     @Column()
     name: string;
+
+    @Expose({ name: "label" })
+    label(): string {
+        return `#${this.name}`;
+    }
 
     @CreateDateColumn()
     created_at: Date;
