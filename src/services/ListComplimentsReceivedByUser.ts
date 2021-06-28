@@ -1,3 +1,4 @@
+import { classToPlain } from "class-transformer";
 import { getCustomRepository } from "typeorm"
 import { ComplimentsRepository } from "../repositories/ComplimentsRepository"
 
@@ -12,7 +13,7 @@ class ListComplimentsReceivedByUser {
             relations: ["sender", "tag"]
         });
 
-        return compliments;
+        return classToPlain(compliments);
     }
 }
 
