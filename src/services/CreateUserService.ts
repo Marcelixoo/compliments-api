@@ -19,7 +19,7 @@ class CreateUserService {
         this.usersRepository = getCustomRepository(UsersRepository);
     }
 
-    async execute({ name, email, admin, password }: ICreateUserRequest) {
+    async execute({ name, email, admin = false, password }: ICreateUserRequest) {
         await this.assertEmailIsNotYetTaken(email);
 
         const hashedPassword = await hash(String(password), 8);
